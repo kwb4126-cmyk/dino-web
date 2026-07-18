@@ -2,60 +2,59 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>디노 시드샵</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grow a Garden</title>
 <style>
-    body { background: #050308; color: #fff; font-family: sans-serif; padding: 15px; margin: 0; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 600px; margin: 0 auto; }
-    .card { background: linear-gradient(145deg, #1e1230, #130a20); border: 1px solid #6c5ce7; border-radius: 16px; padding: 15px; text-align: center; }
-    button { cursor: pointer; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 8px; width: 100%; margin-top: 8px; }
+    body { background: #fdf5f5; font-family: 'Pretendard', sans-serif; margin: 0; padding-bottom: 80px; }
+    .header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+    .card { background: #fff; border-radius: 16px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border: 1px solid #f0f0f0; }
+    .discount-badge { background: #3b82f6; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; float: right; font-weight: bold; }
+    .item-icon { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 10px 0; }
+    .grade { font-size: 0.75rem; color: #ec4899; font-weight: bold; display: block; text-align: left; }
+    .item-name { font-weight: bold; font-size: 0.95rem; display: block; text-align: left; margin: 5px 0; }
+    .price { color: #10b981; font-weight: bold; font-size: 1.1rem; display: block; text-align: left; margin: 10px 0; }
+    .btn-row { display: flex; gap: 6px; }
+    button { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .btn-add { background: #f3f4f6; color: #6b7280; }
+    .btn-buy { background: #2563eb; color: white; }
+    .chat-btn { position: fixed; bottom: 20px; right: 20px; background: #5856d6; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; }
 </style>
 </head>
 <body>
-    <nav style="text-align:center; margin-bottom:20px;">
-        <button onclick="checkOrder()" style="background:#444; width:auto; padding:10px 30px;">거래 바로가기</button>
-    </nav>
-    <div class="grid" id="itemGrid"></div>
 
-    <script>
-        const SCRIPT_URL = "여기에_구글_웹앱_URL";
-        const ITEMS = [
-            { name: "문블", price: 100, icon: "🌕" },
-            { name: "히블", price: 130, icon: "🌀" },
-            { name: "드브", price: 300, icon: "🔥" },
-            { name: "썬블", price: 1500, icon: "☀️" },
-            { name: "물뿌리개", price: 10, icon: "🚿" },
-            { name: "스프링클러", price: 11, icon: "💧" }
-        ];
+<div class="header">
+    <strong>Grow a Garden</strong>
+    <button style="background:#2563eb; color:white;">로그인</button>
+</div>
 
-        function render() {
-            document.getElementById('itemGrid').innerHTML = ITEMS.map(it => `
-                <div class="card">
-                    <div style="font-size:2rem">${it.icon}</div>
-                    <div style="font-weight:bold">${it.name}</div>
-                    <div class="price">${it.price}원</div>
-                    <button onclick="order('${it.name}', ${it.price})">구매하기</button>
+<div class="grid" id="itemGrid"></div>
+<div class="chat-btn">💬</div>
+
+<script>
+    const ITEMS = [
+        { name: "골드씨앗", price: "1,000원 / 100개", grade: "MYTHIC", discount: "-50%", icon: "🌟" },
+        { name: "히프노 블룸", price: "200원", grade: "MYTHIC", discount: "-95%", icon: "🌀" },
+        { name: "메가씨앗", price: "50원", grade: "MYTHIC", discount: "-50%", icon: "🟦" },
+        { name: "스타푸루츠", price: "12,000원", grade: "SUPER", discount: "-50%", icon: "✨" }
+    ];
+
+    function render() {
+        document.getElementById('itemGrid').innerHTML = ITEMS.map(it => `
+            <div class="card">
+                <span class="discount-badge">${it.discount}</span>
+                <div class="item-icon">${it.icon}</div>
+                <small class="grade">● ${it.grade}</small>
+                <div class="item-name">${it.name}</div>
+                <div class="price">${it.price}</div>
+                <div class="btn-row">
+                    <button class="btn-add">담기</button>
+                    <button class="btn-buy" onclick="alert('주문 처리 시스템 연동 예정')">구매</button>
                 </div>
-            `).join('');
-        }
-        
-        async function order(name, price) {
-            const nick = prompt("닉네임을 입력하세요:");
-            if (!nick) return;
-            const orderId = 'D-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'order', orderId, name, nick, total: price }) });
-            navigator.clipboard.writeText(orderId);
-            alert("주문 완료! 주문번호가 복사되었습니다: " + orderId);
-        }
-        
-        async function checkOrder() {
-            const id = prompt("주문번호를 입력하세요:");
-            if (!id) return;
-            const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
-            const data = await res.json();
-            alert(`상태: ${data.status}\n관리자 답변: ${data.adminMsg || '대기 중...'}`);
-        }
-        
-        render();
-    </script>
+            </div>
+        `).join('');
+    }
+    render();
+</script>
 </body>
 </html>
