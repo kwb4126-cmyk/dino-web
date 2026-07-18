@@ -16,22 +16,51 @@
 </head>
 <body>
 
-<!-- 씨앗 섹션 -->
 <h2>씨앗 (Seeds)</h2>
-<div class="grid">
-    <div class="card"><div class="emoji">☀️</div><div class="name">썬블라썸</div><button class="btn-buy" onclick="alert('썬블라썸 구매')">구매</button></div>
-    <div class="card"><div class="emoji">🌕</div><div class="name">문블라썸</div><button class="btn-buy" onclick="alert('문블라썸 구매')">구매</button></div>
-    <div class="card"><div class="emoji">🔥</div><div class="name">드래곤브레스</div><button class="btn-buy" onclick="alert('드래곤브레스 구매')">구매</button></div>
-    <div class="card"><div class="emoji">🌀</div><div class="name">히프노블라썸</div><button class="btn-buy" onclick="alert('히프노 구매')">구매</button></div>
-    <div class="card"><div class="emoji">👻</div><div class="name">고스트페퍼</div><button class="btn-buy" onclick="alert('고스트페퍼 구매')">구매</button></div>
-</div>
+<div class="grid" id="seedGrid"></div>
 
-<!-- 기어 섹션 -->
 <h2>기어 (Gear)</h2>
-<div class="grid">
-    <div class="card"><div class="emoji">🚿</div><div class="name">스프링클러</div><button class="btn-buy" onclick="alert('스프링클러 구매')">구매</button></div>
-    <div class="card"><div class="emoji">🌈</div><div class="name">슈퍼물뿌리개</div><button class="btn-buy" onclick="alert('슈퍼물뿌리개 구매')">구매</button></div>
-</div>
+<div class="grid" id="gearGrid"></div>
+
+<script>
+    // 상품 데이터
+    const seeds = ["썬블라썸", "문블라썸", "드래곤브레스", "히프노", "고스트페퍼"];
+    const gears = ["스프링클러", "슈퍼물뿌리개"];
+
+    // 카드 생성 함수
+    function createCards(list, containerId) {
+        const container = document.getElementById(containerId);
+        list.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="name">${item}</div>
+                <button class="btn-buy" onclick="openOrder('${item}')">구매</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 주문 창 열기
+    function openOrder(itemName) {
+        const nick = prompt("로블록스 닉네임을 입력하세요:");
+        if (!nick) return;
+        const qty = prompt(itemName + " 수량을 입력하세요:");
+        if (!qty) return;
+
+        // 티켓 형식 알림
+        alert(`[주문 티켓]
+-----------------------
+상품명: ${itemName}
+닉네임: ${nick}
+수량: ${qty}개
+-----------------------
+관리자에게 주문이 접수되었습니다!`);
+    }
+
+    createCards(seeds, 'seedGrid');
+    createCards(gears, 'gearGrid');
+</script>
 
 </body>
 </html>
