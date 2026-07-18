@@ -3,78 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>디노 시드샵 - Professional</title>
+<title>디노 시드샵 - 전문 상점</title>
 <style>
-  :root {
-    --bg: #0a050f;
-    --card-bg: rgba(30, 20, 45, 0.7);
-    --accent: #9d4edd;
-    --text: #ffffff;
-    --gold: #f4b400;
-  }
-  body { 
-    background: linear-gradient(135deg, #1e0a29, #0a050f); 
-    color: var(--text); 
-    font-family: 'Segoe UI', sans-serif; 
-    margin: 0; 
-    padding: 20px; 
-  }
-  header { text-align: center; padding: 40px 0; border-bottom: 1px solid #4a1d63; }
-  #adminToggleBtn { background: transparent; border: 1px solid #4a1d63; color: #888; border-radius: 20px; padding: 5px 15px; cursor: pointer; float: right; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 30px auto; }
-  .card { background: var(--card-bg); border: 1px solid #4a1d63; border-radius: 16px; padding: 20px; text-align: center; transition: 0.3s; }
-  .card:hover { border-color: var(--accent); transform: translateY(-5px); }
-  .card img { width: 100px; height: 100px; border-radius: 10px; margin-bottom: 15px; }
-  .buy-btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; }
+  :root { --bg: #0a050f; --card-bg: #1a1025; --accent: #6c5ce7; --gold: #f4b400; --text: #fff; }
+  body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; max-width: 800px; margin: 0 auto; }
+  .card { background: var(--card-bg); border: 1px solid #4a1d63; border-radius: 16px; padding: 15px; text-align: center; position: relative; }
+  .badge { position: absolute; top: 10px; left: 10px; background: #e05a4e; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; }
   .price { color: var(--gold); font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
+  .qty-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
+  .qty-btn { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer; }
+  .cart-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<button id="adminToggleBtn">관리자 접속</button>
-<header>
-  <h1>샵 주인: 디노</h1>
-  <p>최고 등급의 씨앗을 즉시 배송해 드립니다.</p>
-</header>
-
-<div class="grid" id="itemGrid">
-  <!-- 아이템 목록 (이미지 주소 교체 가능) -->
-  <div class="card">
-    <img src="https://via.placeholder.com/100" alt="Gold Seed">
-    <h3>Gold Seed</h3>
-    <div class="price">0.1 원</div>
-    <button class="buy-btn" onclick="order('Gold Seed', 0.1)">구매하기</button>
-  </div>
-  <div class="card">
-    <img src="https://via.placeholder.com/100" alt="Rainbow Seed">
-    <h3>Rainbow Seed</h3>
-    <div class="price">0.3 원</div>
-    <button class="buy-btn" onclick="order('Rainbow Seed', 0.3)">구매하기</button>
-  </div>
-</div>
+<div class="grid" id="itemGrid"></div>
 
 <script>
-  // 관리자 비밀번호 (보안: 실제 서비스 시 난독화 권장)
-  const ADMIN_PASS = "dino1234";
+  const ITEMS = [
+    { name: "문블라썸", price: 100, icon: "🌕" },
+    { name: "히프노블라썸", price: 130, icon: "🌀" },
+    { name: "드레곤브레스", price: 300, icon: "🔥" },
+    { name: "썬블라썸", price: 1500, icon: "☀️" },
+    { name: "슈퍼물뿌리개", price: 10, icon: "🚿" },
+    { name: "슈퍼스프링클러", price: 11, icon: "💧" }
+  ];
 
-  function order(item, price) {
-    const nick = prompt("닉네임을 입력하세요:");
-    const qty = prompt("수량을 입력하세요:");
-    if (nick && qty) {
-      const msg = `[주문] 샵 주인: 디노 | 아이템: ${item} | 수량: ${qty} | 닉네임: ${nick} | 총액: ${price * qty}원`;
-      alert("다음 내용을 복사하여 전송하세요:\n\n" + msg);
-    }
+  function render() {
+    const grid = document.getElementById('itemGrid');
+    grid.innerHTML = ITEMS.map((it, idx) => `
+      <div class="card">
+        <div class="badge">Hot</div>
+        <div style="font-size:3rem">${it.icon}</div>
+        <h3>${it.name}</h3>
+        <div class="price">${it.price}원</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
+          <span class="qty-val">1</span>
+          <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+        </div>
+        <button class="cart-btn" onclick="order('${it.name}', ${it.price}, this)">구매하기</button>
+      </div>
+    `).join('');
   }
 
-  document.getElementById('adminToggleBtn').onclick = () => {
-    const input = prompt("관리자 비밀번호를 입력하세요:");
-    if (input === ADMIN_PASS) {
-      alert("관리자 권한 확인됨. (관리 페이지 로직을 추가하세요)");
-    } else {
-      alert("보안 위반: 비밀번호가 틀렸습니다.");
-    }
-  };
-</script>
+  function changeQty(btn, delta) {
+    const display = btn.parentElement.querySelector('.qty-val');
+    let val = parseInt(display.innerText) + delta;
+    display.innerText = val < 1 ? 1 : val;
+  }
 
+  function order(name, price, btn) {
+    const qty = btn.parentElement.querySelector('.qty-val').innerText;
+    const nick = prompt("닉네임을 입력하세요:");
+    if (!nick) return;
+    alert(`[주문 요청]\n아이템: ${name}\n수량: ${qty}개\n닉네임: ${nick}\n총액: ${price * qty}원\n\n관리자에게 이 내용을 전송하세요.`);
+  }
+
+  render();
+</script>
 </body>
 </html>
