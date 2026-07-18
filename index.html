@@ -2,90 +2,77 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grow a Garden - 통합샵</title>
 <style>
     body { background: #fdf5f5; font-family: 'Pretendard', sans-serif; margin: 0; padding-bottom: 80px; }
     .header { background: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-    .section-title { padding: 15px 10px 5px; font-weight: bold; color: #333; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
     .card { background: #fff; border-radius: 16px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center; border: 1px solid #f0f0f0; }
-    .hot-badge { background: #e11d48; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; float: right; font-weight: bold; }
-    .item-icon { height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 10px 0; }
-    .price { color: #10b981; font-weight: bold; margin: 5px 0; }
-    button { cursor: pointer; padding: 8px; border: none; border-radius: 8px; font-weight: bold; width: 100%; }
-    .btn-buy { background: #2563eb; color: white; margin-top: 5px; }
-    #adminPanel { display: none; background: #fff; padding: 20px; border-top: 5px solid #2563eb; }
+    .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; margin-left: 2px; }
+    .hot { background: #e11d48; color: white; }
+    .new { background: #10b981; color: white; }
+    .btn-buy { background: #2563eb; color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; font-weight: bold; }
+    
+    #loginSection, #shopView, #adminPanel, #cartModal { display: none; }
+    #loginSection { max-width: 300px; margin: 50px auto; padding: 20px; background: white; border-radius: 16px; text-align: center; display: block; }
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
-<div class="header">
-    <strong>Grow a Garden</strong>
-    <button onclick="adminLogin()" style="width:auto; background:#eee;">로그인</button>
+<!-- 로그인 영역 -->
+<div id="loginSection">
+    <h2>로그인 / 가입</h2>
+    <input type="text" id="nick" placeholder="닉네임">
+    <input type="password" id="pw" placeholder="비밀번호">
+    <button class="btn-buy" onclick="login()">시작하기</button>
 </div>
 
 <!-- 상점 영역 -->
 <div id="shopView">
-    <div class="section-title">🌱 씨앗 (Seeds)</div>
-    <div class="grid" id="seedGrid"></div>
-    <div class="section-title">⚙️ 기어 (Gear)</div>
-    <div class="grid" id="gearGrid"></div>
+    <div class="header"><strong>Grow a Garden</strong></div>
+    <div class="grid" id="mainGrid"></div>
 </div>
 
 <!-- 관리자 영역 -->
 <div id="adminPanel">
-    <h2>🔐 관리자 대시보드</h2>
-    <button onclick="hideAdmin()" style="background:#e5e7eb;">닫기</button>
+    <div class="header"><strong>관리자 모드</strong> <button onclick="location.reload()">로그아웃</button></div>
+    <div style="padding:20px;">주문 목록이 여기에 표시됩니다.</div>
 </div>
 
 <script>
-    const SEEDS = [
-        { name: "썬블", price: "1,500원", icon: "☀️" },
-        { name: "스타", price: "12,000원", icon: "✨" },
-        { name: "문블", price: "150원", icon: "🌕" }
+    const ITEMS = [
+        { name: "썬블라썸", price: "1,500원", icon: "☀️", badges: ["HOT", "NEW"] },
+        { name: "스타프루트", price: "12,000원", icon: "✨", badges: ["HOT", "NEW"] },
+        { name: "문블라썸", price: "150원", icon: "🌕", badges: ["HOT"] },
+        { name: "드래곤 브레스", price: "250원", icon: "🔥", badges: ["HOT"] },
+        { name: "히프노 블라썸", price: "120원", icon: "🌀", badges: ["HOT"] }
     ];
-    const GEARS = [
-        { name: "물뿌리개", price: "1,000원 / 100개", icon: "🚿" },
-        { name: "스프링클러", price: "1,000원 / 100개", icon: "💧" }
-    ];
+
+    function login() {
+        const nick = document.getElementById('nick').value;
+        const pw = document.getElementById('pw').value;
+        if (nick === "admin" && pw === "1234") { // 관리자 계정 직접 설정
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+        } else if (nick && pw) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('shopView').style.display = 'block';
+            render();
+        }
+    }
 
     function render() {
-        document.getElementById('seedGrid').innerHTML = SEEDS.map(it => `
+        document.getElementById('mainGrid').innerHTML = ITEMS.map(it => `
             <div class="card">
-                <span class="hot-badge">HOT</span>
-                <div class="item-icon">${it.icon}</div>
+                <div>${it.badges.map(b => `<span class="badge ${b.toLowerCase()}">${b}</span>`).join('')}</div>
+                <div style="font-size:2.5rem; margin:10px 0;">${it.icon}</div>
                 <div style="font-weight:bold">${it.name}</div>
-                <div class="price">${it.price}</div>
-                <button class="btn-buy" onclick="alert('구매 시도: ${it.name}')">구매</button>
-            </div>
-        `).join('');
-
-        document.getElementById('gearGrid').innerHTML = GEARS.map(it => `
-            <div class="card">
-                <span class="hot-badge">HOT</span>
-                <div class="item-icon">${it.icon}</div>
-                <div style="font-weight:bold">${it.name}</div>
-                <div class="price">${it.price}</div>
-                <button class="btn-buy" onclick="alert('구매 시도: ${it.name}')">구매</button>
+                <div style="color:#10b981; font-weight:bold; margin:5px 0;">${it.price}</div>
+                <button class="btn-buy" onclick="alert('주문창 구현 예정')">구매</button>
             </div>
         `).join('');
     }
-
-    function adminLogin() {
-        const pw = prompt("비밀번호:");
-        if (pw === "admin1234") {
-            document.getElementById('shopView').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        } else { alert("비밀번호 불일치"); }
-    }
-
-    function hideAdmin() {
-        document.getElementById('shopView').style.display = 'block';
-        document.getElementById('adminPanel').style.display = 'none';
-    }
-
-    render();
 </script>
 </body>
 </html>
