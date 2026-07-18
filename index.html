@@ -2,62 +2,86 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>디노 시드샵</title>
 <style>
-  body { background: #0a050f; color: #fff; font-family: sans-serif; padding: 15px; margin: 0; }
+  body { background: #0a050f; color: #fff; font-family: sans-serif; margin: 0; padding: 15px; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
-  .card { background: #1a1025; border: 1px solid #4a1d63; border-radius: 12px; padding: 15px; text-align: center; }
-  .price { color: #f4b400; font-weight: bold; margin: 8px 0; }
-  button { cursor: pointer; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 8px; width: 100%; margin-top: 5px; }
-  #adminView { display: none; background: #111; padding: 20px; border-radius: 10px; }
+  .card { background: #1a1025; border: 1px solid #4a1d63; border-radius: 12px; padding: 10px; text-align: center; position: relative; }
+  .badge { position: absolute; top: 8px; left: 8px; background: #e05a4e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; }
+  .price { color: #f4b400; font-weight: bold; margin: 8px 0; font-size: 1.1rem; }
+  .qty-control { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; }
+  .qty-btn { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; }
+  .cart-btn { background: #6c5ce7; color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; cursor: pointer; }
+  nav { max-width: 600px; margin: 0 auto 20px; }
 </style>
 </head>
 <body>
 
-<!-- 사용자 화면 -->
-<div id="shopView">
-  <nav style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-    <button onclick="checkOrder()">거래 바로가기</button>
-  </nav>
-  <div class="grid" id="itemGrid"></div>
-  <p onclick="adminLogin()" style="font-size:5px; color:#1a1025; cursor:pointer;">.</p>
-</div>
-
-<!-- 관리자 화면 (숨김) -->
-<div id="adminView">
-  <h2>🔐 관리자 대시보드</h2>
-  <div id="adminOrders">데이터 로딩 중...</div>
-  <button onclick="hideAdmin()" style="background:#444;">돌아가기</button>
-</div>
+<nav><button onclick="checkOrder()" style="width:100%; padding:12px;">거래 바로가기</button></nav>
+<div class="grid" id="itemGrid"></div>
+<p onclick="adminLogin()" style="font-size:2px; color:#1a1025; cursor:pointer;">.</p>
 
 <script>
-  const SCRIPT_URL = "여기에_구글_앱스_스크립트_URL_입력";
+  const SCRIPT_URL = "여기에_배포된_웹앱_URL";
+  const ITEMS = [
+    { name: "문블", price: 100, icon: "🌕" },
+    { name: "히블", price: 130, icon: "🌀" },
+    { name: "드브", price: 300, icon: "🔥" },
+    { name: "썬블", price: 1500, icon: "☀️" },
+    { name: "물뿌리개", price: 10, icon: "🚿" },
+    { name: "스프링클러", price: 11, icon: "💧" }
+  ];
 
-  // 관리자 로그인
+  function render() {
+    document.getElementById('itemGrid').innerHTML = ITEMS.map(it => `
+      <div class="card">
+        <div class="badge">Hot</div>
+        <div style="font-size:2.5rem">${it.icon}</div>
+        <div style="font-weight:bold; margin-top:5px;">${it.name}</div>
+        <div class="price">${it.price}원</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
+          <span class="qty-val">1</span>
+          <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+        </div>
+        <button class="cart-btn" onclick="order('${it.name}', ${it.price}, this)">구매하기</button>
+      </div>
+    `).join('');
+  }
+
+  function changeQty(btn, delta) {
+    const d = btn.parentElement.querySelector('.qty-val');
+    let v = parseInt(d.innerText) + delta;
+    d.innerText = v < 1 ? 1 : v;
+  }
+
+  async function order(name, price, btn) {
+    const qty = btn.parentElement.querySelector('.qty-val').innerText;
+    const nick = prompt("닉네임을 입력하세요:");
+    if (!nick) return;
+    const orderId = 'D-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'order', orderId, name, qty, nick, total: price * qty }) });
+    alert("주문 완료! 주문번호: " + orderId + "\n'거래 바로가기'에서 답변을 확인하세요.");
+  }
+
+  async function checkOrder() {
+    const id = prompt("주문번호를 입력하세요:");
+    if (!id) return;
+    const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
+    const data = await res.json();
+    alert(`상태: ${data.status}\n관리자 답변: ${data.adminMsg || '아직 대기 중입니다.'}`);
+  }
+
   function adminLogin() {
-    const pw = prompt("관리자 비밀번호:");
-    if (pw === "1234") { // 비밀번호 설정
-      document.getElementById('shopView').style.display = 'none';
-      document.getElementById('adminView').style.display = 'block';
-      loadAdminOrders();
+    const pw = prompt("관리자 비번:");
+    if (pw === "1234") {
+      alert("관리자 모드 활성화 (기능 구현 필요)");
+      // 여기에 관리자 대시보드 로직 추가
     }
   }
 
-  function hideAdmin() {
-    document.getElementById('shopView').style.display = 'block';
-    document.getElementById('adminView').style.display = 'none';
-  }
-
-  // 관리자 답장 기능
-  async function sendReply(orderId) {
-    const msg = prompt("손님에게 보낼 계좌/메시지:");
-    if (!msg) return;
-    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reply', orderId, msg }) });
-    alert("전송 완료!");
-    loadAdminOrders();
-  }
-
-  // 주문 및 조회 기능은 이전 답변의 로직을 그대로 사용 (생략)
+  render();
 </script>
 </body>
 </html>
