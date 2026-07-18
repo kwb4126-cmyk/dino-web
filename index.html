@@ -3,45 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grow a Garden - 상점</title>
+<title>Grow a Garden</title>
 <style>
-    /* 전체 디자인 */
-    body { background: #fdf5f5; font-family: 'Pretendard', sans-serif; margin: 0; padding: 15px; color: #333; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    
-    /* 카테고리 타이틀 */
+    body { background: #fdf5f5; font-family: sans-serif; margin: 0; padding: 15px; color: #333; }
     h2 { font-size: 1.2rem; margin: 25px 0 15px; color: #444; border-left: 4px solid #2563eb; padding-left: 10px; }
-    
-    /* 그리드 레이아웃 */
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .card { background: #fff; border-radius: 16px; padding: 20px; text-align: center; border: 1px solid #f0f0f0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    
-    /* 요소 디자인 */
     .emoji { font-size: 3rem; margin-bottom: 10px; }
     .name { font-weight: bold; font-size: 1.05rem; margin-bottom: 15px; }
-    .btn-buy { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-buy:active { transform: scale(0.98); }
+    .btn-buy { background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<div class="header">
-    <strong>Grow a Garden</strong>
-</div>
-
 <!-- 씨앗 섹션 -->
 <h2>씨앗 (Seeds)</h2>
 <div class="grid">
-    <div class="card"><div class="emoji">☀️</div><div class="name">썬</div><button class="btn-buy" onclick="alert('썬 구매')">구매</button></div>
+    <div class="card"><div class="emoji">☀️</div><div class="name">썬블라썸</div><button class="btn-buy" onclick="alert('썬블라썸 구매')">구매</button></div>
     <div class="card"><div class="emoji">🌕</div><div class="name">문블라썸</div><button class="btn-buy" onclick="alert('문블라썸 구매')">구매</button></div>
     <div class="card"><div class="emoji">🔥</div><div class="name">드래곤브레스</div><button class="btn-buy" onclick="alert('드래곤브레스 구매')">구매</button></div>
-    <div class="card"><div class="emoji">🌀</div><div class="name">히프노</div><button class="btn-buy" onclick="alert('히프노 구매')">구매</button></div>
+    <div class="card"><div class="emoji">🌀</div><div class="name">히프노블라썸</div><button class="btn-buy" onclick="alert('히프노 구매')">구매</button></div>
+    <div class="card"><div class="emoji">👻</div><div class="name">고스트페퍼</div><button class="btn-buy" onclick="alert('고스트페퍼 구매')">구매</button></div>
 </div>
 
 <!-- 기어 섹션 -->
 <h2>기어 (Gear)</h2>
 <div class="grid">
-    <div class="card"><div class="emoji">👻</div><div class="name">고스트</div><button class="btn-buy" onclick="alert('고스트 구매')">구매</button></div>
     <div class="card"><div class="emoji">🚿</div><div class="name">스프링클러</div><button class="btn-buy" onclick="alert('스프링클러 구매')">구매</button></div>
     <div class="card"><div class="emoji">🌈</div><div class="name">슈퍼물뿌리개</div><button class="btn-buy" onclick="alert('슈퍼물뿌리개 구매')">구매</button></div>
 </div>
