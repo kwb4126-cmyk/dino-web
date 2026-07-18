@@ -1,42 +1,76 @@
 <!DOCTYPE html>
+<!-- 상단 메뉴에 추가 -->
+<nav>
+  <button onclick="showMessenger()">거래 바로가기</button>
+</nav>
+
+<!-- 거래 확인 모달 (메신저) -->
+<div id="messengerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; padding:20px;">
+  <div class="modal">
+    <h3>주문 확인하기</h3>
+    <input type="text" id="checkOrderId" placeholder="주문번호를 입력하세요">
+    <button onclick="checkOrder()">조회</button>
+    <div id="messageArea" style="margin-top:15px; border-top:1px solid #444; padding-top:10px;"></div>
+    <button onclick="document.getElementById('messengerModal').style.display='none'">닫기</button>
+  </div>
+</div>
+
+<script>
+  // 주문 시 주문번호 생성 및 전송
+  async function order(name, price, btn) {
+    const qty = btn.parentElement.querySelector('.qty-val').innerText;
+    const nick = prompt("닉네임을 입력하세요:");
+    if (!nick) return;
+
+    const payload = { action: 'order', name, qty, nick, total: price * qty };
+    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+    
+    alert("주문 완료! 주문번호: " + data.orderId + "\n'거래 바로가기'에서 확인하세요.");
+  }
+
+  // 주문번호로 내역 조회
+  async function checkOrder() {
+    const id = document.getElementById('checkOrderId').value;
+    const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
+    const data = await res.json();
+    document.getElementById('messageArea').innerHTML = 
+      `상태: ${data.status}<br>관리자 메시지: ${data.adminMsg || '대기 중...'}`;
+  }
+</script>
+
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>디노 시드샵 - 전문 상점</title>
+<title>디노 시드샵</title>
 <style>
   :root { --bg: #0a050f; --card-bg: #1a1025; --accent: #6c5ce7; --gold: #f4b400; --text: #fff; }
-  body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; max-width: 800px; margin: 0 auto; }
-  .card { background: var(--card-bg); border: 1px solid #4a1d63; border-radius: 16px; padding: 15px; text-align: center; position: relative; }
-  .badge { position: absolute; top: 10px; left: 10px; background: #e05a4e; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7rem; }
-  .price { color: var(--gold); font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
-  .qty-control { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
-  .qty-btn { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; cursor: pointer; }
-  .cart-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; }
+  body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
+  .card { background: var(--card-bg); border: 1px solid #4a1d63; border-radius: 12px; padding: 10px; text-align: center; }
+  .price { color: var(--gold); font-size: 1rem; font-weight: bold; margin: 8px 0; }
+  .qty-control { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; }
+  .qty-btn { background: #333; color: white; border: none; width: 25px; height: 25px; border-radius: 4px; cursor: pointer; }
+  .cart-btn { background: var(--accent); color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; cursor: pointer; }
 </style>
 </head>
 <body>
-
 <div class="grid" id="itemGrid"></div>
-
 <script>
   const ITEMS = [
-    { name: "문블라썸", price: 100, icon: "🌕" },
-    { name: "히프노블라썸", price: 130, icon: "🌀" },
-    { name: "드레곤브레스", price: 300, icon: "🔥" },
-    { name: "썬블라썸", price: 1500, icon: "☀️" },
-    { name: "슈퍼물뿌리개", price: 10, icon: "🚿" },
-    { name: "슈퍼스프링클러", price: 11, icon: "💧" }
+    { name: "문블", price: 100, icon: "🌕" },
+    { name: "히블", price: 130, icon: "🌀" },
+    { name: "드브", price: 300, icon: "🔥" },
+    { name: "썬블", price: 1500, icon: "☀️" },
+    { name: "물뿌리개", price: 10, icon: "🚿" },
+    { name: "스프링클러", price: 11, icon: "💧" }
   ];
-
   function render() {
-    const grid = document.getElementById('itemGrid');
-    grid.innerHTML = ITEMS.map((it, idx) => `
+    document.getElementById('itemGrid').innerHTML = ITEMS.map(it => `
       <div class="card">
-        <div class="badge">Hot</div>
-        <div style="font-size:3rem">${it.icon}</div>
-        <h3>${it.name}</h3>
+        <div style="font-size:2rem">${it.icon}</div>
+        <div style="font-weight:bold">${it.name}</div>
         <div class="price">${it.price}원</div>
         <div class="qty-control">
           <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
@@ -47,20 +81,21 @@
       </div>
     `).join('');
   }
-
   function changeQty(btn, delta) {
-    const display = btn.parentElement.querySelector('.qty-val');
-    let val = parseInt(display.innerText) + delta;
-    display.innerText = val < 1 ? 1 : val;
+    const d = btn.parentElement.querySelector('.qty-val');
+    let v = parseInt(d.innerText) + delta;
+    d.innerText = v < 1 ? 1 : v;
   }
-
   function order(name, price, btn) {
     const qty = btn.parentElement.querySelector('.qty-val').innerText;
     const nick = prompt("닉네임을 입력하세요:");
     if (!nick) return;
-    alert(`[주문 요청]\n아이템: ${name}\n수량: ${qty}개\n닉네임: ${nick}\n총액: ${price * qty}원\n\n관리자에게 이 내용을 전송하세요.`);
+    const msg = `[주문 요청]\n아이템: ${name}\n수량: ${qty}개\n닉네임: ${nick}\n총액: ${price * qty}원`;
+    navigator.clipboard.writeText(msg).then(() => {
+      alert("주문 내용이 복사되었습니다! 오픈채팅방에 붙여넣기 하세요.");
+      window.location.href = "https://open.kakao.com/o/본인의오픈채팅링크"; // 링크 수정 필수
+    });
   }
-
   render();
 </script>
 </body>
