@@ -2,35 +2,62 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>디노 시드샵</title>
+<title>디노 시드샵 - 올인원</title>
 <style>
-  body { background: #0a050f; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+  body { background: #0a050f; color: #fff; font-family: sans-serif; padding: 15px; margin: 0; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
-  .card { background: #1a1025; padding: 15px; border-radius: 12px; }
-  button { cursor: pointer; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 8px; }
+  .card { background: #1a1025; border: 1px solid #4a1d63; border-radius: 12px; padding: 15px; text-align: center; }
+  .price { color: #f4b400; font-weight: bold; margin: 8px 0; }
+  button { cursor: pointer; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 8px; width: 100%; margin-top: 5px; }
+  #adminView { display: none; background: #111; padding: 20px; border-radius: 10px; }
 </style>
 </head>
 <body>
-  <nav><button onclick="checkOrder()">거래 바로가기</button></nav>
+
+<!-- 사용자 화면 -->
+<div id="shopView">
+  <nav style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+    <button onclick="checkOrder()">거래 바로가기</button>
+  </nav>
   <div class="grid" id="itemGrid"></div>
-  <script>
-    const SCRIPT_URL = "여기에_배포된_웹앱_URL";
-    async function order(name, price, btn) {
-      const qty = btn.parentElement.querySelector('.qty-val').innerText;
-      const nick = prompt("닉네임을 입력하세요:");
-      if (!nick) return;
-      const orderId = 'D-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-      await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'order', orderId, name, qty, nick, total: price * qty }) });
-      alert("주문 완료! 주문번호: " + orderId);
+  <p onclick="adminLogin()" style="font-size:5px; color:#1a1025; cursor:pointer;">.</p>
+</div>
+
+<!-- 관리자 화면 (숨김) -->
+<div id="adminView">
+  <h2>🔐 관리자 대시보드</h2>
+  <div id="adminOrders">데이터 로딩 중...</div>
+  <button onclick="hideAdmin()" style="background:#444;">돌아가기</button>
+</div>
+
+<script>
+  const SCRIPT_URL = "여기에_구글_앱스_스크립트_URL_입력";
+
+  // 관리자 로그인
+  function adminLogin() {
+    const pw = prompt("관리자 비밀번호:");
+    if (pw === "1234") { // 비밀번호 설정
+      document.getElementById('shopView').style.display = 'none';
+      document.getElementById('adminView').style.display = 'block';
+      loadAdminOrders();
     }
-    async function checkOrder() {
-      const id = prompt("주문번호를 입력하세요:");
-      if (!id) return;
-      const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
-      const data = await res.json();
-      alert(`상태: ${data.status}\n관리자 메시지: ${data.adminMsg || '대기 중...'}`);
-    }
-    // (아이템 렌더링 생략 - 이전 코드와 동일)
-  </script>
+  }
+
+  function hideAdmin() {
+    document.getElementById('shopView').style.display = 'block';
+    document.getElementById('adminView').style.display = 'none';
+  }
+
+  // 관리자 답장 기능
+  async function sendReply(orderId) {
+    const msg = prompt("손님에게 보낼 계좌/메시지:");
+    if (!msg) return;
+    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reply', orderId, msg }) });
+    alert("전송 완료!");
+    loadAdminOrders();
+  }
+
+  // 주문 및 조회 기능은 이전 답변의 로직을 그대로 사용 (생략)
+</script>
 </body>
 </html>
