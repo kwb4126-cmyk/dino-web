@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { background-color: blue; color: white; padding: 20px; font-family: sans-serif; }
+    .item { border: 1px solid white; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
 <body>
-  <h1>Hello World! 내 첫 웹사이트!</h1>
+  <h1>게임 아이템 상점</h1>
+  <div class="item">
+    <h3>전설의 검 - 가격 개당: 5,000원</h3>
+    <button onclick="showOrderForm('전설의 검', 5000)">구매하기</button>
+  </div>
+
+  <div id="orderForm" style="display:none; background: white; color: black; padding: 20px; margin-top: 20px;">
+    <h2 id="itemName"></h2>
+    닉네임: <input type="text" id="nickname"><br>
+    수량: <input type="number" id="quantity"><br>
+    <button onclick="sendOrder()">메신저로 주문 보내기</button>
+  </div>
+
+  <script>
+    let selectedItem = "";
+    let selectedPrice = 0;
+
+    function showOrderForm(name, price) {
+      selectedItem = name;
+      selectedPrice = price;
+      document.getElementById('itemName').innerText = name + " 구매하기";
+      document.getElementById('orderForm').style.display = 'block';
+    }
+
+    function sendOrder() {
+      const nick = document.getElementById('nickname').value;
+      const qty = document.getElementById('quantity').value;
+      const msg = `[주문] 아이템: ${selectedItem}, 수량: ${qty}, 닉네임: ${nick}, 총금액: ${selectedPrice * qty}원`;
+      
+      // 여기에 본인의 카카오톡 오픈채팅 '링크'를 넣으세요
+      const kakaoLink = "https://open.kakao.com/o/여기에본인의오픈채팅주소입력";
+      window.location.href = kakaoLink;
+      alert("다음 메시지를 복사해서 보내주세요: " + msg);
+    }
+  </script>
 </body>
 </html>
