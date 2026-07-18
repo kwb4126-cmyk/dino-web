@@ -1,46 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <style>
-    body { background-color: blue; color: white; padding: 20px; font-family: sans-serif; }
-    .item { border: 1px solid white; padding: 10px; margin: 10px 0; }
+    body { background-color: #0d0d0d; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+    .shop-header { margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 600px; margin: 0 auto; }
+    .card { background: #1a1a1a; border: 1px solid #444; border-radius: 10px; padding: 15px; }
+    .price { color: #f39c12; font-size: 1.2rem; font-weight: bold; margin: 10px 0; }
+    button { background: #e67e22; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h1>게임 아이템 상점</h1>
-  <div class="item">
-    <h3>전설의 검 - 가격 개당: 5,000원</h3>
-    <button onclick="showOrderForm('전설의 검', 5000)">구매하기</button>
+
+  <div class="shop-header">
+    <h1>샵 주인: 디노</h1>
+    <p>지금 바로 아이템을 구매하세요!</p>
   </div>
 
-  <div id="orderForm" style="display:none; background: white; color: black; padding: 20px; margin-top: 20px;">
-    <h2 id="itemName"></h2>
-    닉네임: <input type="text" id="nickname"><br>
-    수량: <input type="number" id="quantity"><br>
-    <button onclick="sendOrder()">메신저로 주문 보내기</button>
+  <div class="grid">
+    <!-- 아이템 카드 1 -->
+    <div class="card">
+      <p>Gold Seed</p>
+      <div class="price">0.1 원</div>
+      <button onclick="order('Gold Seed', '0.1')">구매하기</button>
+    </div>
+    <!-- 아이템 카드 2 -->
+    <div class="card">
+      <p>Rainbow Seed</p>
+      <div class="price">0.3 원</div>
+      <button onclick="order('Rainbow Seed', '0.3')">구매하기</button>
+    </div>
   </div>
 
   <script>
-    let selectedItem = "";
-    let selectedPrice = 0;
-
-    function showOrderForm(name, price) {
-      selectedItem = name;
-      selectedPrice = price;
-      document.getElementById('itemName').innerText = name + " 구매하기";
-      document.getElementById('orderForm').style.display = 'block';
-    }
-
-    function sendOrder() {
-      const nick = document.getElementById('nickname').value;
-      const qty = document.getElementById('quantity').value;
-      const msg = `[주문] 아이템: ${selectedItem}, 수량: ${qty}, 닉네임: ${nick}, 총금액: ${selectedPrice * qty}원`;
-      
-      // 여기에 본인의 카카오톡 오픈채팅 '링크'를 넣으세요
-      const kakaoLink = "https://open.kakao.com/o/여기에본인의오픈채팅주소입력";
-      window.location.href = kakaoLink;
-      alert("다음 메시지를 복사해서 보내주세요: " + msg);
+    function order(item, price) {
+      const nick = prompt("닉네임을 입력하세요:");
+      const qty = prompt("수량을 입력하세요:");
+      if (nick && qty) {
+        const msg = `[주문] 샵 주인: 디노 | 아이템: ${item} | 수량: ${qty} | 닉네임: ${nick} | 총액: ${price * qty}원`;
+        // 여기서 카톡이나 구글폼으로 연결할 수 있습니다.
+        alert("복사해서 주인에게 보내주세요:\n\n" + msg);
+      }
     }
   </script>
 </body>
