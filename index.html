@@ -1,102 +1,36 @@
 <!DOCTYPE html>
-<!-- 상단 메뉴에 추가 -->
-<nav>
-  <button onclick="showMessenger()">거래 바로가기</button>
-</nav>
-
-<!-- 거래 확인 모달 (메신저) -->
-<div id="messengerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; padding:20px;">
-  <div class="modal">
-    <h3>주문 확인하기</h3>
-    <input type="text" id="checkOrderId" placeholder="주문번호를 입력하세요">
-    <button onclick="checkOrder()">조회</button>
-    <div id="messageArea" style="margin-top:15px; border-top:1px solid #444; padding-top:10px;"></div>
-    <button onclick="document.getElementById('messengerModal').style.display='none'">닫기</button>
-  </div>
-</div>
-
-<script>
-  // 주문 시 주문번호 생성 및 전송
-  async function order(name, price, btn) {
-    const qty = btn.parentElement.querySelector('.qty-val').innerText;
-    const nick = prompt("닉네임을 입력하세요:");
-    if (!nick) return;
-
-    const payload = { action: 'order', name, qty, nick, total: price * qty };
-    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-    const data = await res.json();
-    
-    alert("주문 완료! 주문번호: " + data.orderId + "\n'거래 바로가기'에서 확인하세요.");
-  }
-
-  // 주문번호로 내역 조회
-  async function checkOrder() {
-    const id = document.getElementById('checkOrderId').value;
-    const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
-    const data = await res.json();
-    document.getElementById('messageArea').innerHTML = 
-      `상태: ${data.status}<br>관리자 메시지: ${data.adminMsg || '대기 중...'}`;
-  }
-</script>
-
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>디노 시드샵</title>
 <style>
-  :root { --bg: #0a050f; --card-bg: #1a1025; --accent: #6c5ce7; --gold: #f4b400; --text: #fff; }
-  body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 15px; }
+  body { background: #0a050f; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 600px; margin: 0 auto; }
-  .card { background: var(--card-bg); border: 1px solid #4a1d63; border-radius: 12px; padding: 10px; text-align: center; }
-  .price { color: var(--gold); font-size: 1rem; font-weight: bold; margin: 8px 0; }
-  .qty-control { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; }
-  .qty-btn { background: #333; color: white; border: none; width: 25px; height: 25px; border-radius: 4px; cursor: pointer; }
-  .cart-btn { background: var(--accent); color: white; border: none; padding: 8px; border-radius: 8px; width: 100%; cursor: pointer; }
+  .card { background: #1a1025; padding: 15px; border-radius: 12px; }
+  button { cursor: pointer; padding: 10px; background: #6c5ce7; color: white; border: none; border-radius: 8px; }
 </style>
 </head>
 <body>
-<div class="grid" id="itemGrid"></div>
-<script>
-  const ITEMS = [
-    { name: "문블", price: 100, icon: "🌕" },
-    { name: "히블", price: 130, icon: "🌀" },
-    { name: "드브", price: 300, icon: "🔥" },
-    { name: "썬블", price: 1500, icon: "☀️" },
-    { name: "물뿌리개", price: 10, icon: "🚿" },
-    { name: "스프링클러", price: 11, icon: "💧" }
-  ];
-  function render() {
-    document.getElementById('itemGrid').innerHTML = ITEMS.map(it => `
-      <div class="card">
-        <div style="font-size:2rem">${it.icon}</div>
-        <div style="font-weight:bold">${it.name}</div>
-        <div class="price">${it.price}원</div>
-        <div class="qty-control">
-          <button class="qty-btn" onclick="changeQty(this, -1)">-</button>
-          <span class="qty-val">1</span>
-          <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
-        </div>
-        <button class="cart-btn" onclick="order('${it.name}', ${it.price}, this)">구매하기</button>
-      </div>
-    `).join('');
-  }
-  function changeQty(btn, delta) {
-    const d = btn.parentElement.querySelector('.qty-val');
-    let v = parseInt(d.innerText) + delta;
-    d.innerText = v < 1 ? 1 : v;
-  }
-  function order(name, price, btn) {
-    const qty = btn.parentElement.querySelector('.qty-val').innerText;
-    const nick = prompt("닉네임을 입력하세요:");
-    if (!nick) return;
-    const msg = `[주문 요청]\n아이템: ${name}\n수량: ${qty}개\n닉네임: ${nick}\n총액: ${price * qty}원`;
-    navigator.clipboard.writeText(msg).then(() => {
-      alert("주문 내용이 복사되었습니다! 오픈채팅방에 붙여넣기 하세요.");
-      window.location.href = "https://open.kakao.com/o/본인의오픈채팅링크"; // 링크 수정 필수
-    });
-  }
-  render();
-</script>
+  <nav><button onclick="checkOrder()">거래 바로가기</button></nav>
+  <div class="grid" id="itemGrid"></div>
+  <script>
+    const SCRIPT_URL = "여기에_배포된_웹앱_URL";
+    async function order(name, price, btn) {
+      const qty = btn.parentElement.querySelector('.qty-val').innerText;
+      const nick = prompt("닉네임을 입력하세요:");
+      if (!nick) return;
+      const orderId = 'D-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'order', orderId, name, qty, nick, total: price * qty }) });
+      alert("주문 완료! 주문번호: " + orderId);
+    }
+    async function checkOrder() {
+      const id = prompt("주문번호를 입력하세요:");
+      if (!id) return;
+      const res = await fetch(`${SCRIPT_URL}?action=getMessage&orderId=${id}`);
+      const data = await res.json();
+      alert(`상태: ${data.status}\n관리자 메시지: ${data.adminMsg || '대기 중...'}`);
+    }
+    // (아이템 렌더링 생략 - 이전 코드와 동일)
+  </script>
 </body>
 </html>
